@@ -35,20 +35,26 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
         global key
         global log
         global logseq, logtop
-	global version
+        global version
         # self.request is the TCP socket connected to the client
-        while (True):
-            self.data = self.rfile.readline().strip()
-            print "[I] {} Received command:".format(self.client_address[0])
-            print self.data
-            out = {}
-            out["errorcode"] = -2
-            try:
-                cmd = json.loads(self.data)
-                # return version
-                if cmd["command"] == "version":
-                    out["version"] = version
-                    out["errorcode"] = 0
+        self.data = self.rfile.readline().strip()
+        print "[I] {} Received command:".format(self.client_address[0])
+        print self.data
+        out = {}
+        out["errorcode"] = -2
+        try:
+            cmd = json.loads(self.data)
+            # return version
+            if cmd["command"] == "version":
+                out["version"] = version
+                out["errorcode"] = 0
+            elif "version" not in cmd:
+                out["errorcode"] = -4
+                out["error"] = "You should provide 'version' field."
+            elif cmd["version"] != version:
+                out["errorcode"] = -666
+                out["error"] = "Requested version " + cmd["version"] + " but the gateway version is " + version
+            else:
                 # sign bytes
                 if cmd["command"] == "sign":
                     #sign message
@@ -63,7 +69,6 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                     logseq += 1
                     #add log
                     log.append(logentry)
-
                     # Decode from DER
                     # Fourth byte has got the length of R, and R follows
                     # (First three bytes are: 30 - sequence follows, total length byte, 02 indicating
@@ -92,16 +97,18 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                         out["timestamp"] = logentry["timestamp"]
                         out["tick"] = logentry["tick"]
                         out["errorcode"] = 0
-                        logtop += 1
                 # return public key
                 if cmd["command"] == "getPubKey":
                     out["pubKey"] = binascii.hexlify(
                         key.pubkey.serialize(compressed=False))
                     out["errorcode"] = 0
-            except Exception, e:
-                print('[E] Error: ' + str(e))
-                pass
-            self.request.sendall(json.dumps(out) + "\n")
+        except Exception, e:
+            print('[E] Error: ' + str(e))
+            print repr(e)
+            out["error"] = 'unhandled exception with message ' + str(e)
+            out["errorcode"] = -4
+            logtop += 1
+        self.request.sendall(json.dumps(out) + "\n")
 
 
 if __name__ == "__main__":
