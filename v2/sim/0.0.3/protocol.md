@@ -32,16 +32,22 @@
 ### Sign
 
 #### Request
+
+For this operation, depending on the `keyId` parameter, there's two possible formats: the authorized and the non-authorized. Details follow.
+
+##### Authorized format
+
+This format is only valid for the BTC and tBTC key ids (see corresponding section for details).
+
 ```
 {
     "command": "sign",
     "keyId": "xxxxx", // (*)
-    "message": { // (**)
-        tx: "hhhh", // (x)
-        input: i, // (xx)
-        hash: "hhhh", // (xxx)
+    "message": {
+        tx: "hhhh", // (**)
+        input: i // (***)
     },
-    "auth": { // (***)
+    "auth": {
         rsk_block_header: "hhhh",
         receipt: "hhhh",
         receipt_merkle_proof: [
@@ -53,20 +59,31 @@
 
 // (*) the given string must be the
 // BIP44 path of the key to use for signing.
-// See valid BIP44 paths below.
-
-// (**) fields required in this object depend on the given key id.
-// For the BTC (tBTC) key id, only fields "tx" and "input" are expected.
-// For the RSK (tRSK) and MST (tMST) key ids, only the field "hash" is expected.
-
-// (***) only needed if signing with the BTC (tBTC) key.
-
-// (x) the fully serialized BTC transaction
+// See valid BIP44 paths below (BTC and tBTC for this format).
+// (**) the fully serialized BTC transaction
 // that needs to be signed.
-// (xx) the input index of the BTC transaction
+// (***) the input index of the BTC transaction
 // that needs to be signed.
-// (xxx) the hash that needs to be signed by
-// either the RSK or MST key.
+```
+
+##### Non-authorized format
+
+This format is only valid for the RSK, MST, tRSK and tMST key ids (see corresponding section for details).
+
+```
+{
+    "command": "sign",
+    "keyId": "xxxxx", // (*)
+    "message": {
+        hash: "hhhh", // (**)
+    },
+    "version": 2
+}
+
+// (*) the given string must be the
+// BIP44 path of the key to use for signing.
+// See valid BIP44 paths below (RSK, MST, tBTC and tMST for this format).
+// (**) the hash that needs to be signed.
 ```
 
 #### Response
@@ -85,7 +102,7 @@
 - `-1`: Wrong auth
 - `-2`: Generic error (device not ready)
 - `-3`: Invalid message
-- `-4`: Invalid key ID
+- `-5`: Invalid key ID
 - `-10`: Wrong version
 
 ### Get public key
@@ -115,7 +132,7 @@
 - `0`: Ok
 - `-1`: Wrong auth
 - `-2`: Generic error (device not ready)
-- `-4`: Invalid key ID
+- `-5`: Invalid key ID
 - `-10`: Wrong version
 
 ### Generic error codes
