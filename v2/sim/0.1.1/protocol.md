@@ -242,7 +242,7 @@ This operation can return `0` and generic errors. See the error codes section fo
 ```
 
 **Error codes:**
-This operation can return `0`, `1`, `-201`, `-203`, `-204`, and generic errors. See the error codes section for details.
+This operation can return `0`, `-201`, `-203`, `-204`, and generic errors. See the error codes section for details.
 
 ### Error and success codes
 
