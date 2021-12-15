@@ -32,6 +32,6 @@ fi
 
 docker images|grep -q $DOCKNAME && BQUIET=-q
 
-docker build -t $DOCKNAME $BQUIET .
+docker build --platform linux/x86_64 -t $DOCKNAME $BQUIET .
 
-docker run -ti --rm -p $PORT:$PORT -v "`pwd`:/hsm2" -w "/hsm2" -u "`id -u`:`id -g`" $DOCKNAME ./sim $@ $SIM_ARGS
+docker run --platform linux/x86_64 -ti --rm -p $PORT:$PORT -v "`pwd`:/hsm2" -w "/hsm2" -u "`id -u`:`id -g`" $DOCKNAME ./sim $@ $SIM_ARGS
