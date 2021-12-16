@@ -3,9 +3,9 @@
 # needs secp256k1, install with:
 #     $ sudo pip install secp256k1
 # run with:
-#     $ python fedhm-mockup.py
+#     $ python3 fedhm-mockup.py
 # for options:
-#     $ python fedhm-mockup.py -h
+#     $ python3 fedhm-mockup.py -h
 #
 #
 # example client test:
@@ -22,7 +22,7 @@ Escape character is '^]'.
 #
 
 import json
-import SocketServer
+import socketserver
 import secp256k1
 import binascii
 import time
@@ -30,7 +30,7 @@ from optparse import OptionParser
 
 version = 1
 
-class MyTCPHandler(SocketServer.StreamRequestHandler):
+class MyTCPHandler(socketserver.StreamRequestHandler):
     def handle(self):
         global key
         global log
@@ -38,8 +38,8 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
         global version
         # self.request is the TCP socket connected to the client
         self.data = self.rfile.readline().strip()
-        print "[I] {} Received command:".format(self.client_address[0])
-        print self.data
+        print("[I] {} Received command:").format(self.client_address[0])
+        print(self.data)
         out = {}
         out["errorcode"] = -2
         try:
@@ -102,9 +102,9 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                     out["pubKey"] = binascii.hexlify(
                         key.pubkey.serialize(compressed=False))
                     out["errorcode"] = 0
-        except Exception, e:
+        except Exception as e:
             print('[E] Error: ' + str(e))
-            print repr(e)
+            print(repr(e))
             out["error"] = 'unhandled exception with message ' + str(e)
             out["errorcode"] = -4
             logtop += 1
@@ -133,28 +133,28 @@ if __name__ == "__main__":
     logseq = 0
     logtop = 0
     # Create/load a secp256 key
-    print "[I] Loading key file %s" % filename
+    print("[I] Loading key file %s" % filename)
     try:
         keyfile = open(filename, "rb")
         keybytes = keyfile.read(1000).rstrip()
         keyfile.close()
         key = secp256k1.PrivateKey()
         key.deserialize(keybytes)
-        print "[I] Loaded.Privkey: %s" % key.serialize()
+        print("[I] Loaded.Privkey: %s" % key.serialize())
     except:
-        print "[I] File not found, generating key..."
+        print("[I] File not found, generating key...")
         key = secp256k1.PrivateKey(privkey=None)
-        print "[I] Generated. Privkey: %s" % key.serialize()
+        print("[I] Generated. Privkey: %s" % key.serialize())
         keyfile = open(filename, "wb")
         keybytes = keyfile.write(key.serialize())
         keyfile.close()
-        print "[I] Key saved as %s" % filename
+        print("[I] Key saved as %s" % filename)
 
     # Create the server, binding to HOST:PORT
-    SocketServer.TCPServer.allow_reuse_address = True
-    server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
+    socketserver.TCPServer.allow_reuse_address = True
+    server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
-    print "[I] Listening on %s:%d" % (HOST, PORT)
+    print("[I] Listening on %s:%d" % (HOST, PORT))
     server.serve_forever()
