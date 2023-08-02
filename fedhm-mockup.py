@@ -146,7 +146,7 @@ if __name__ == "__main__":
         key = secp256k1.PrivateKey(privkey=None)
         print("[I] Generated. Privkey: %s" % key.serialize())
         keyfile = open(filename, "wb")
-        keybytes = keyfile.write(key.serialize())
+        keybytes = keyfile.write(key.serialize().encode())
         keyfile.close()
         print("[I] Key saved as %s" % filename)
 
