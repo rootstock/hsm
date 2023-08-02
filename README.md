@@ -7,15 +7,17 @@ Make sure you have Python 3 install.
 
 Also, make sure you have pip installed with Python 3.
 
-Needs secp256k1, install with:
+You will probably need to create a Python venv (virtual environment) with `python3 -m venv <env_name>`, to install the dependencies like:
+
+> python3 -m venv my_env
+
+Install `secp256k1` with:
 
 > sudo pip install secp256k1
 
 Run with:
 
 > python3 fedhm-mockup.py
-
-You may need to create a file named `key.secp256` manually and put the generated private key in it.
 
 For options:
 
