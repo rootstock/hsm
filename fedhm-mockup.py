@@ -11,7 +11,7 @@
 # example client test:
 #
 """
-guest@guest-thinkpad:~$ telnet localhost 9999
+user@host:~$ telnet localhost 9999
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
